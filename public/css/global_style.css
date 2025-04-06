@@ -1,0 +1,44 @@
+:root {
+    --primary-color: #1b63ff;
+    --white-color: rgb(255, 255, 255);
+}
+
+.header-nav img {
+    width: 170px;
+    height: 170px;
+    border-radius: 100%;
+}
+
+.info-profile h1 {
+    color: var(--white-color);
+}
+.info-profile h6{
+    color: var(--white-color);
+}
+body {
+    /* display: flex;
+    justify-content: center;
+    align-items: center;*/
+    min-height: 100vh;
+    /* background-color: #F8F8F8; */
+    background: url("https://images.unsplash.com/photo-1663587482482-444c06006d00?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+.text-name a{
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+}
+
+.text-name a:hover {
+    display: inline-block;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
+.custom-bg {
+    background-color: #6495ED !important;
+}
