@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 class BaseAPIController extends Controller {
     public function sendSuccess($msg = null, $data=[]) {
+        // $data = response()->json([
+        //     "role" => $this->Ro
+
+        // ]);
         return response()->json([
             'success' => true,
             'data'      => $data,

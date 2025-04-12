@@ -3,9 +3,17 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Models\Student;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
+//use ZipArchive;
+//use RecursiveIteratorIterator;
+//use RecursiveDirectoryIterator;
+
+
+
+
+
+
+
 
 
 
@@ -35,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home-page', [HomeController::class, "homePage"])->name('homePage');
     Route::get('/list-images', [HomeController::class, "listStudent"])->name('listImages');
     Route::get('/download-folder/{id}', function ($id) {
+
         // Find the student by ID
         $student = Student::find($id);
 
@@ -48,13 +57,12 @@ Route::middleware(['auth'])->group(function () {
 
         // Prepare a folder path where the images will be temporarily stored
         $folderPath = storage_path('app/public/students/' . $id);
-        // $zipFileName = 'student_' . $id . '-images.zip';
-        $zipFileName = $student->name.'.zip';
+        $zipFileName = $student->name . '.zip';
         $zipPath = storage_path('app/public/' . $zipFileName);
 
         // Create the folder if it doesn't exist
         if (!file_exists($folderPath)) {
-            mkdir($folderPath, 0777, true); // Create folder recursively
+            mkdir($folderPath, 0777, true);
         }
 
         // Check if images exist
@@ -69,9 +77,9 @@ Route::middleware(['auth'])->group(function () {
             copy($imagePath, $destinationPath);
         }
 
-        $zip = new ZipArchive;
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath));
+        $zip = new \ZipArchive;
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folderPath));
             foreach ($files as $file) {
                 if (!$file->isDir()) {
                     $zip->addFile($file->getRealPath(), substr($file->getRealPath(), strlen($folderPath) + 1));
@@ -83,31 +91,8 @@ Route::middleware(['auth'])->group(function () {
         // Return the zip file as a download
         return response()->download($zipPath)->deleteFileAfterSend(true);
     });
-    // Route::get('/download-folder/{id}', function ($id) {
-
-    //     dd($id);
-    //     $folderPath = Storage::path('public/students'); // Updated
-    //     $zipFileName = 'my-folder.zip';
-    //     $zipPath = storage_path('app/public/' . $zipFileName);
-
-    //     if (!file_exists($folderPath)) {
-    //         return abort(404, "Folder not found.");
-    //     }
-
-    //     $zip = new ZipArchive;
-    //     if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-    //         $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath));
-    //         foreach ($files as $file) {
-    //             if (!$file->isDir()) {
-    //                 $zip->addFile($file->getRealPath(), substr($file->getRealPath(), strlen($folderPath) + 1));
-    //             }
-    //         }
-    //         $zip->close();
-    //     }
-
-    //     return response()->download($zipPath)->deleteFileAfterSend(true);
-    // });
-
 
 });
+
+
 

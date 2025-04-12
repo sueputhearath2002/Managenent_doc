@@ -16,7 +16,7 @@
                     </div>
 
                 </div>
-                <button class="btn btn-outline-primary" onclick="window.location.href='{{ url('download-folder',['student_id' => $student->id]) }}'">
+                <button class="btn btn-outline-primary" onclick="window.location.href='{{ url('download-folder',['user_id' => $student->id]) }}'">
                     <i class="fa-solid fa-cloud-arrow-down me-1"></i>
                     <span>Download Folder</span>
                 </button>
