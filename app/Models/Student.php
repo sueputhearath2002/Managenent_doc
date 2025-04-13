@@ -21,4 +21,9 @@ class Student extends Model
         return $this->hasMany(Image::class, 'user_id', 'id');
     }
 
+    public function student()
+    {
+        return $this->belongsTo(Attendance::class,"");
+    }
+
 }

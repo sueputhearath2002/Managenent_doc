@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,9 @@ Route::get('/', function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [StudentController::class, 'logout']);
     Route::group(['prefix' => 'student', 'as' => 'student.'], function () {
-    Route::post('/upload-images', [StudentController::class, 'uploadImages'])->name('upload.images');
+        Route::post('/upload-images', [StudentController::class, 'uploadImages'])->name('upload.images');
+        Route::post('/get-students', [StudentController::class, 'getStudent'])->name('get.student');
+        Route::post('/check-attendance', [StudentController::class, 'checkAttendance'])->name('check.attendance');
+        Route::post('/upload-model', [FileController::class, 'uploadModel']);
     });
 });

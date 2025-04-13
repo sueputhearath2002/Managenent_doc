@@ -1,37 +1,51 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
-use ZipArchive;
+use function PHPUnit\Framework\isEmpty;
 
-class FileController extends Controller
+class FileController extends BaseAPIController
 {
-    public function downloadFolder()
+    public function uploadModel(Request $request): \Illuminate\Http\JsonResponse
     {
-        $folderPath = public_path('uploads'); // The folder to zip
-        $zipFileName = 'files.zip'; // Name of the zip file
-        $zipFilePath = public_path($zipFileName);
+        try {
 
-        // Create a new zip archive
-        $zip = new ZipArchive;
-
-        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-            // Scan folder and add files to the zip
-            $files = glob($folderPath . '/*');
-
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    $zip->addFile($file, basename($file));
-                }
+            $file = $request->file('file');
+            $label = $request->file('label');
+            if ($file->getClientOriginalExtension() !== 'tflite' && !isEmpty($file)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only .tflite files are allowed.',
+                ], 400);
+            }
+            if($label->getClientOriginalExtension() !== 'txt' && !isEmpty($label)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The label Only .txt files are allowed.',
+                ], 400);
             }
 
-            $zip->close();
-        } else {
-            return response()->json(['message' => 'Could not create zip file'], 500);
-        }
 
-        // Download the zip file
-        return response()->download($zipFilePath)->deleteFileAfterSend(true);
+            // Store the file
+            $filename = 'fruites.tflite';
+            $labelName = 'labels.txt';
+            $path = $file->storeAs('models', $filename, 'public');
+            $pathLabel = $file->storeAs('labels', $labelName, 'public');
+
+            // Generate the full URL
+            $url = asset('storage/' . $path);
+            $pathLabelUrl = asset('storage/' . $pathLabel);
+
+            return response()->json([
+                'success' => true,
+                'url' => $url,
+                'label' =>  $pathLabelUrl,
+            ]);
+        } catch (\Exception $ex) {
+            return $this->sendError($ex->getMessage(), 400);
+        }
     }
+
+
+
 }

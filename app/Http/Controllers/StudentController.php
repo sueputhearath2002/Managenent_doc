@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\Student;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
+use function PHPUnit\Framework\isEmpty;
+use function Sodium\add;
 
 class StudentController extends BaseAPIController
 {
@@ -118,8 +122,8 @@ class StudentController extends BaseAPIController
             // Generate token
             $token = $student->createToken('student-token')->plainTextToken;
             return $this->sendSuccess("Login successful!", [
-                'token'     => $token,
-                'student'   =>  $student->select("name", "email", "password", "photo", "id")->where("email", $request->email)->first(),
+                'token' => $token,
+                'student' => $student->select("name", "email", "password", "photo", "id")->where("email", $request->email)->first(),
                 'role' => $student->roles->pluck('name'),
             ]);
         } catch (Exception $ex) {
@@ -145,13 +149,96 @@ class StudentController extends BaseAPIController
             ]);
 
             $user = Student::find(Auth()->user()->id);
+            $paths = [];
             foreach ($request->file('images') as $upload_file) {
-                $path   = saveImage($upload_file, 'students');
+                $path = saveImage($upload_file, 'students');
                 $user->images()->create(['path' => $path]);
+                $paths[] = $path;
             }
-            return $this->sendSuccess("Uploaded");
+            $uploadedImages = $user->images()->whereIn('path', $paths)->get();
+            return $this->sendSuccess("Uploaded", $uploadedImages);
         } catch (Exception $ex) {
             return $this->sendError($ex->getMessage());
         }
     }
+
+    public function getStudent()
+    {
+        $students = Student::all();
+        if (empty($students)) {
+            return $this->sendError("No students found");
+        }
+        return $this->sendSuccess("Uploaded", $students);
+    }
+
+    public function checkAttendance(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $request->validate([
+                'students' => 'required|array',
+            ]);
+
+            $date = Carbon::now()->toDateString();
+            $time = Carbon::now()->toTimeString();
+
+            $studentNames = collect($request->input('students'))->map(fn($n) => strtolower(trim($n)));
+
+            // Get all students from DB
+            $allStudents = Student::all();
+
+            foreach ($allStudents as $student) {
+                $isPresent = $studentNames->contains(strtolower($student->name));
+
+                // Check if already has attendance today
+                $attendance = Attendance::where('studentId', $student->id)
+                    ->where('attendanceDate', $date)
+                    ->first();
+
+                if ($attendance) {
+                    // Update status
+                    $attendance->update([
+                        'status' => $isPresent ? 'Present' : 'Absent',
+                        'attendanceTime' => $time,
+                        'reason' => '',
+                    ]);
+                } else {
+                    // Create new record
+                    Attendance::create([
+                        'studentId' => $student->id,
+                        'status' => $isPresent ? 'Present' : 'Absent',
+                        'attendanceDate' => $date,
+                        'attendanceTime' => $time,
+                        'reason' => '',
+                    ]);
+                }
+            }
+
+            return $this->sendSuccess("Attendance recorded successfully.");
+        } catch (\Exception $ex) {
+            return $this->sendError($ex->getMessage());
+        }
+
+
+    }
+
+//    public function uploadModel(Request $request)
+//    {
+//        $request->validate([
+//            'file' => 'required|file|mimes:tflite',
+//        ]);
+//
+//        $file = $request->file('file');
+//        $filename = 'fruit_classifier.tflite'; // Override with same name
+//        $path = $file->storeAs('models', $filename, 'public'); // Store in storage/app/public/models/
+//
+//        $url = asset('storage/' . $path); // Full public URL
+//
+//        return response()->json([
+//            'success' => true,
+//            'url' => $url,
+//            'path' => $path,
+//        ]);
+//    }
+
+
 }
