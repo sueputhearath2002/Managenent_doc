@@ -15,40 +15,6 @@ use function Sodium\add;
 
 class StudentController extends BaseAPIController
 {
-    // public function register_student(Request $request)
-    // {
-    //     // Manually validate the request
-    //     try {
-    //         $request->validate([
-    //             'name' => 'required|string|max:255',
-    //             'email' => 'required|string|email|max:255',
-    //             'password' => 'required|string|min:6|confirmed',
-    //             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-    //         ]);
-
-
-    //         $photoPath = $request->hasFile('photo') ? $request->file('photo')->store('student', 'public') : null;
-    //         $role_student = Role::where('name', 'student')->first();
-    //         // dd($role_student);
-    //         $student = Student::create([
-    //             'name' => $request->name,
-    //             'email' => $request->email,
-    //             'password' => Hash::make($request->password),
-    //             'photo' => $photoPath
-    //         ]);
-
-    //         if ($role_student) {
-    //             $student->assignRole($role_student);
-    //         }
-
-
-    //         return $this->sendSuccess("Registration successful!",$student);
-
-    //     } catch (Exception $ex) {
-    //         return $this->sendError($ex->getMessage());
-    //     }
-    // }
-
     public function register_student(Request $request)
     {
         try {
@@ -125,6 +91,7 @@ class StudentController extends BaseAPIController
                 'token' => $token,
                 'student' => $student->select("name", "email", "password", "photo", "id")->where("email", $request->email)->first(),
                 'role' => $student->roles->pluck('name'),
+                'permissions' => $student->getAllPermissions()->pluck('name')
             ]);
         } catch (Exception $ex) {
             return $this->sendError($ex->getMessage(), 400);
@@ -221,24 +188,26 @@ class StudentController extends BaseAPIController
 
     }
 
-//    public function uploadModel(Request $request)
-//    {
-//        $request->validate([
-//            'file' => 'required|file|mimes:tflite',
-//        ]);
-//
-//        $file = $request->file('file');
-//        $filename = 'fruit_classifier.tflite'; // Override with same name
-//        $path = $file->storeAs('models', $filename, 'public'); // Store in storage/app/public/models/
-//
-//        $url = asset('storage/' . $path); // Full public URL
-//
-//        return response()->json([
-//            'success' => true,
-//            'url' => $url,
-//            'path' => $path,
-//        ]);
-//    }
+    public function updateRole(Request $request)
+    {
+        try{
+            $request->validate([
+                "id"=>'required',
+                'role' => 'required|exists:roles,name', // role must exist in roles table
+            ]);
+
+            $student = Student::find($request->id);
+            $role = Role::where('name', $request->role)->first();
+
+            // Sync role (removes old roles and attaches new one)
+            $student->roles()->sync([$role->id]);
+
+            return response()->json(['message' => 'Role updated successfully']);
+        }catch (Exception $ex){
+            return $this->sendError($ex->getMessage());
+        }
+    }
+
 
 
 }

@@ -18,4 +18,10 @@ class Attendance extends Model
         "attendanceTime",
     ];
 
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'studentId');
+    }
+
+
 }

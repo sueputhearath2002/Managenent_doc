@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: laravel-app
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    buildCommand: ""
+    startCommand: "apache2-foreground"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_KEY
+        value: base64:base64:c+DP+lQ28Tu1uHTXeqfBLVXP4Cc3ie62PLRuW2LMiP0=
+      - key: DB_HOST
+        value: 127.0.0.1
+      - key: DB_PORT
+        value: 3306
+      - key: DB_DATABASE
+        value: shopping_app
+      - key: DB_USERNAME
+        value: root
+      - key: DB_PASSWORD
+        value:

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 
@@ -21,9 +22,15 @@ class Student extends Model
         return $this->hasMany(Image::class, 'user_id', 'id');
     }
 
-    public function student()
+    public function role()
     {
-        return $this->belongsTo(Attendance::class,"");
+        return $this->belongsToMany(Role::class, 'roles', 'id', 'id');
     }
+
+
+//    public function student()
+//    {
+//        return $this->belongsTo(Attendance::class,"");
+//    }
 
 }

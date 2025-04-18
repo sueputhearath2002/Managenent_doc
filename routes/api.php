@@ -34,5 +34,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/get-students', [StudentController::class, 'getStudent'])->name('get.student');
         Route::post('/check-attendance', [StudentController::class, 'checkAttendance'])->name('check.attendance');
         Route::post('/upload-model', [FileController::class, 'uploadModel']);
+        Route::post('/update-role', [StudentController::class, 'updateRole']);
     });
 });

@@ -9,42 +9,51 @@ class FileController extends BaseAPIController
     public function uploadModel(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            $request->validate([
+                'file' => 'required|file|max:102400', // 100MB in kilobytes
+            ]);
 
             $file = $request->file('file');
             $label = $request->file('label');
-            if ($file->getClientOriginalExtension() !== 'tflite' && !isEmpty($file)) {
+
+            if (!$file) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Model file is missing.',
+                ], 400);
+            }
+
+            if ($file->getClientOriginalExtension() !== 'tflite') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Only .tflite files are allowed.',
                 ], 400);
             }
-            if($label->getClientOriginalExtension() !== 'txt' && !isEmpty($label)) {
+
+            if ($label && $label->getClientOriginalExtension() !== 'txt') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'The label Only .txt files are allowed.',
+                    'message' => 'The label file must be .txt format.',
                 ], 400);
             }
 
-
-            // Store the file
-            $filename = 'fruites.tflite';
+            // Store the files
+            $filename = 'face_detection.tflite';
             $labelName = 'labels.txt';
-            $path = $file->storeAs('models', $filename, 'public');
-            $pathLabel = $file->storeAs('labels', $labelName, 'public');
 
-            // Generate the full URL
-            $url = asset('storage/' . $path);
-            $pathLabelUrl = asset('storage/' . $pathLabel);
+            $path = $file->storeAs('models', $filename, 'public');
+            $labelPath = $label?->storeAs('labels', $labelName, 'public');
 
             return response()->json([
                 'success' => true,
-                'url' => $url,
-                'label' =>  $pathLabelUrl,
+                'url' => asset('storage/' . $path),
+                'label' => $labelPath ? asset('storage/' . $labelPath) : null,
             ]);
         } catch (\Exception $ex) {
             return $this->sendError($ex->getMessage(), 400);
         }
     }
+
 
 
 
