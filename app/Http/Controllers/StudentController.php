@@ -54,8 +54,8 @@ class StudentController extends BaseAPIController
                 'data' => [
                     'user' => $student->only(['name', 'email', 'password', 'photo', 'id']),
                     // ->pluck("name","email","password","photo","id"),
-                    'roles' => $student->roles->pluck('name'),
-                    'permissions' => $student->getAllPermissions()->pluck('name') // Get permission names
+//                    'roles' => $student->roles->pluck('name'),
+//                    'permissions' => $student->getAllPermissions()->pluck('name') // Get permission names
                 ]
             ], 201);
         } catch (Exception $ex) {
