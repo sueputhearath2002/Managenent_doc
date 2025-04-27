@@ -123,7 +123,10 @@ class StudentController extends BaseAPIController
                 $user->images()->create(['path' => $path]);
                 $paths[] = $path;
             }
-            $uploadedImages = $user->images()->whereIn('path', $paths)->get();
+            $uploadedImages = $user->images()->whereIn('path', $paths)->get()->map(function ($image) {
+                $image->path = public_path()."/".$image->path;
+                return $image;
+            });
             return $this->sendSuccess("Uploaded", $uploadedImages);
         } catch (Exception $ex) {
             return $this->sendError($ex->getMessage());
