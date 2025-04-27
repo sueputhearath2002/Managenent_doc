@@ -40,11 +40,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-
+//========================For Login to server========================
 
 //ssh root@103.253.146.193
-//su deployer
 //ROOT PASSWORD //RATH@042002R
+//su deployer
+//cd /var/www/html/Managenent_doc/
+//===============================================
+//for config server
 
 /*
  * 1. sudo systemctl status nginx // check nginx status
