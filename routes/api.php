@@ -37,3 +37,25 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update-role', [StudentController::class, 'updateRole']);
     });
 });
+
+
+
+
+
+//ssh root@103.253.146.193
+//su deployer
+//ROOT PASSWORD //RATH@042002R
+
+/*
+ * 1. sudo systemctl status nginx // check nginx status
+ * 2. sudo systemctl start nginx // check nginx start
+ * 1. sudo systemctl status php{version}-fpm // check php status
+ * 2. sudo systemctl start php{version}-fpm // check php start
+ * 1. sudo systemctl status mysql // check mysql status
+ * 2. sudo systemctl start mysql // check mysql start
+ * sudo nano /etc/nginx/sites-available/{file_name} // make new server block
+ * sudo ln -s /etc/nginx/sites-available/face-detection /etc/nginx/{file_name} // need to enable nginx server block
+ * sudo git clone https://github.com/sueputhearath2002/Managenent_doc.git // clone project into server
+ * sudo chown -R deployer:www-data /var/www/html/{project_name}/ // change owner
+ * sudo chmod -R 775 /var/www/html/{project_name}/storage/ /var/www/html/{project_name}/bootstrap/cache/ // change file mode
+ */
