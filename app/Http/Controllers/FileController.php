@@ -44,11 +44,12 @@ class FileController extends BaseAPIController
             $path = $file->storeAs('models', $filename, 'public');
             $labelPath = $label?->storeAs('labels', $labelName, 'public');
 
-            return response()->json([
-                'success' => true,
-                'url' => asset('storage/' . $path),
-                'label' => $labelPath ? asset('storage/' . $labelPath) : null,
-            ]);
+//            return response()->json([
+//                'success' => true,
+//                'url' => asset('storage/' . $path),
+//                'label' => $labelPath ? asset('storage/' . $labelPath) : null,
+//            ]);
+            return $this->sendSuccess(msg: "success",data:["tlife"=>asset('storage/' . $path),"label"=>$labelPath ? asset('storage/' . $labelPath) : null,] );
         } catch (\Exception $ex) {
             return $this->sendError($ex->getMessage(), 400);
         }

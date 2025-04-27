@@ -100,11 +100,12 @@ class StudentController extends BaseAPIController
 
 
     // Logout student
-    public function logout(Request $request)
+    public function logout(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->user()->tokens()->delete();
+        return  $this->sendSuccess("Logout successful!");
 
-        return response()->json(['message' => 'Logged out successfully']);
+//        return response()->json(['message' => 'Logged out successfully']);
     }
 
     public function uploadImages(Request $request)
