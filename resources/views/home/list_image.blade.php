@@ -13,7 +13,8 @@
                 <div class="info d-flex justify-content-between p-3">
                     <div class="folder-user justify-content-start align-items-center d-flex">
                         <span style="color: #6495ed">
-                            <img src="http://127.0.0.1:8000/storage/{{ $image->path }} " alt="Girl in a jacket"
+
+                            <img src="http://103.253.146.193/storage/{{ $image->path }} " alt="Girl in a jacket"
                                 width="50px" height="50px" />
 
                         </span>
