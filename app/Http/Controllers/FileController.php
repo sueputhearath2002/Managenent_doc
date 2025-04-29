@@ -50,7 +50,7 @@ class FileController extends BaseAPIController
 //                'label' => $labelPath ? asset('storage/' . $labelPath) : null,
 //            ]);
 //            return $this->sendSuccess(msg: "success",data:["tlife"=>asset('storage/' . $path),"label"=>$labelPath ? asset('storage/' . $labelPath) : null,] );
-            return $this->sendSuccess(msg: "success",data:["tlife"=>asset('storage') . '/',"label"=>$labelPath ? asset('storage') . '/' : null,] );
+            return $this->sendSuccess(msg: "success",data:["tlife"=>asset('storage') . '/'. $path,"label"=>$labelPath ? asset('storage') . '/'.$labelPath : null,] );
         } catch (\Exception $ex) {
             return $this->sendError($ex->getMessage(), 400);
         }
