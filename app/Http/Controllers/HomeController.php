@@ -15,7 +15,12 @@ class HomeController extends Controller
     public function layout()
     {
         $data["userEmail"]=Auth::user()->email;
-        $data["students"] = Student::all();
+//        $data["students"] = Student::all();
+        $data["students"] = Student::whereHas('roles', function ($query) {
+            $query->where('name', 'student');
+        })->get();
+//        dd( $students
+//    );
         $userEmail = Auth::user()->email;
         return View("layout", $data);
     }
