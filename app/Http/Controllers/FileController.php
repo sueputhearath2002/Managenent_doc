@@ -41,6 +41,7 @@ class FileController extends BaseAPIController
             $filename = 'face_detection.tflite';
             $labelName = 'labels.txt';
 
+
             $path = $file->storeAs('models', $filename, 'public');
             $labelPath = $label?->storeAs('labels', $labelName, 'public');
 
