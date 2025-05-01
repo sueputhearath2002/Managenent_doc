@@ -103,7 +103,7 @@ class StudentController extends BaseAPIController
     public function logout(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->user()->tokens()->delete();
-        return  $this->sendSuccess("Logout successful!");
+        return $this->sendSuccess("Logout successful!");
 
 //        return response()->json(['message' => 'Logged out successfully']);
     }
@@ -194,9 +194,9 @@ class StudentController extends BaseAPIController
 
     public function updateRole(Request $request)
     {
-        try{
+        try {
             $request->validate([
-                "id"=>'required',
+                "id" => 'required',
                 'role' => 'required|exists:roles,name', // role must exist in roles table
             ]);
 
@@ -207,10 +207,78 @@ class StudentController extends BaseAPIController
             $student->roles()->sync([$role->id]);
 
             return response()->json(['message' => 'Role updated successfully']);
-        }catch (Exception $ex){
+        } catch (Exception $ex) {
             return $this->sendError($ex->getMessage());
         }
     }
+
+    public function filterAttendanceByDate(Request $request)
+    {
+        try {
+            $request->validate([
+                'date' => 'required|date',
+            ]);
+
+            $date = $request->date;
+
+            // Get all attendance records for the given date
+            $attendanceRecords = Attendance::whereDate('attendanceDate', $date)->get();
+
+            // Filter for students who were marked as absent
+            $absentStudentIds = $attendanceRecords
+                ->where("status", "absent")
+                ->pluck("studentId")
+                ->toArray();
+
+            // Get absent students
+            $absentStudents = Student::whereIn('id', $absentStudentIds)->get();
+
+            $response = [
+                'count' => $absentStudents->count(),
+                'total' => $attendanceRecords->count(),
+                'students' => $absentStudents
+            ];
+
+            return $this->sendSuccess("Absent students on $date", $response);
+        } catch (Exception $ex) {
+            return $this->sendError($ex->getMessage());
+        }
+    }
+
+
+    public function filterAttendanceByMonth(Request $request)
+    {
+        try {
+            $request->validate([
+                'month' => 'required|date_format:Y-m', // expecting format like "2025-06"
+            ]);
+
+            [$year, $month] = explode('-', $request->month);
+
+            $attendanceRecords = Attendance::whereYear('attendanceDate', $year)
+                ->whereMonth('attendanceDate', $month)
+                ->get();
+
+            $absentStudentIds = $attendanceRecords
+                ->where("status", "absent")
+                ->pluck("studentId")
+                ->unique()
+                ->toArray();
+
+            $absentStudents = Student::whereIn('id', $absentStudentIds)->get();
+
+            $response = [
+                'count' => $absentStudents->count(),
+                'total' => $attendanceRecords->count(),
+                'students' => $absentStudents
+            ];
+
+            return $this->sendSuccess("Absent students for $month/$year", $response);
+        } catch (Exception $ex) {
+            return $this->sendError($ex->getMessage());
+        }
+    }
+
 
 
 
