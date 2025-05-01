@@ -279,6 +279,40 @@ class StudentController extends BaseAPIController
         }
     }
 
+    public function filterAttendanceByDateStudent(Request $request)
+    {
+        try {
+            $request->validate([
+                'date' => 'required|date',
+            ]);
+
+            $date = $request->date;
+
+            // Get all attendance records for the given date
+            $attendanceRecords = Attendance::whereDate('attendanceDate', $date)->get();
+
+            $user = auth()->user();
+
+            // Filter for students who were marked as absent
+            $absentStudentIds = $attendanceRecords
+                ->where("status", "absent")->where("studentId",$user->id)
+                ->pluck("studentId")
+                ->toArray();
+
+            // Get absent students
+            $absentStudents = Student::whereIn('id', $absentStudentIds)->select(["id","name","email","photo"])->get();
+
+            $response = [
+                'count' => $absentStudents->count(),
+                'total' => $attendanceRecords->count(),
+                'students' => $absentStudents
+            ];
+
+            return $this->sendSuccess("Absent students on $date", $response);
+        } catch (Exception $ex) {
+            return $this->sendError($ex->getMessage());
+        }
+    }
 
 
 
