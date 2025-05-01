@@ -37,7 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update-role', [StudentController::class, 'updateRole']);
         Route::post('/admin/filter-attendance-by-date', [StudentController::class, 'filterAttendanceByDate']);
         Route::post('/admin/filter-attendance-by-month', [StudentController::class, 'filterAttendanceByMonth']);
-        Route::post('/filter-attendance-by-date', [StudentController::class, 'filterAttendanceByDateStudent']);
+        Route::post('/filter-attendance-by-date-student', [StudentController::class, 'filterAttendanceByDateStudent']);
     });
 });
 
