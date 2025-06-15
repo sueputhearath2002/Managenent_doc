@@ -155,7 +155,10 @@ class StudentController extends BaseAPIController
             $studentNames = collect($request->input('students'))->map(fn($n) => strtolower(trim($n)));
 
             // Get all students from DB
-            $allStudents = Student::all();
+            // $allStudents = Student::all();
+            $allStudents = Student::whereDoesntHave('roles', function($query) {
+    $query->where('name', 'admin');
+})->get();
 
             foreach ($allStudents as $student) {
                 $isPresent = $studentNames->contains(strtolower($student->name));
